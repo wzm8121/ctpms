@@ -1,0 +1,117 @@
+
+#端口设置
+server:
+  port: 3000
+
+spring:
+  jpa:
+    open-in-view: false
+
+  rabbitmq:
+    host: 123.60.139.233     # 根据你服务器实际地址修改
+    port: 5672
+    username: admin   # 默认账号
+    password: mzw123456
+    virtual-  host: /
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 15MB
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+  datasource:
+    druid:
+      # 数据库连接URL
+      url: jdbc:mysql://123.60.139.233:3306/ctp_mysql
+      # 数据库用户名
+      username: ctp_mysql
+      # 数据库密码
+      password: 8121536
+      # 连接池初始化时创建的连接数
+      initialSize: 5
+      # 连接池中最大连接数
+      maxActive: 50
+      # 连接池中最小空闲连接数
+      minIdle: 5
+      # 获取连接时的最大等待时间（毫秒）
+      maxWait: 60000
+      # 间隔多久检测一次空闲连接（毫秒）
+      timeBetweenEvictionRunsMillis: 60000
+      # 连接池中连接最小空闲时间（毫秒）
+      minEvictableIdleTimeMillis: 300000
+      # 用于检测连接是否有效的SQL语句
+      validationQuery: SELECT 1
+      # 是否开启空闲连接的检测
+      testWhileIdle: true
+      # 是否开启连接的检测功能，在获取连接时检测连接是否有效
+      testOnBorrow: false
+      # 是否开启连接的检测功能，在归还连接时检测连接是否有效
+      testOnReturn: false
+      # 是否缓存PreparedStatement对象
+      poolPreparedStatements: true
+      # 缓存PreparedStatement对象的最大数量
+      maxPoolPreparedStatementPerConnectionSize: 20
+      # 配置监控统计用的filter，允许监控统计
+      filters: stat
+      # 配置扩展属性，用于监控统计分析SQL性能等
+      connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+  # redis配置
+  redis:
+    # Redis数据库索引（默认为0）
+    database: 0
+    # Redis服务器地址
+    host: 123.60.139.233
+    # Redis服务器连接端口
+    port: 6379
+    # Redis密码
+    password: 8121536
+    # 连接超时时间
+    timeout: 10s
+    lettuce:
+      pool:
+        # 连接池最大连接数
+        max-active: 200
+        # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-wait: -1ms
+        # 连接池中的最大空闲连接
+        max-idle: 10
+        # 连接池中的最小空闲连接
+        min-idle: 0
+
+sa-token:
+  # token名称 (同时也是cookie名称)
+  token-name: CTPMStoken
+  # token有效期，单位s 默认30天, -1代表永不过期
+  timeout: 2592000 # 30天
+  # token临时有效期 (指定时间内无操作就视为token过期) 单位: 秒
+  active-timeout: -1
+  # 是否允许同一账号并发登录 (为true时允许一起登录, 为false时新登录挤掉旧登录)
+  is-concurrent: true
+  # 在多人登录同一账号时，是否共用一个token (为true时所有登录共用一个token, 为false时每次登录新建一个token)
+  is-share: true
+  # token风格
+  token-style: uuid
+  # 是否输出操作日志
+  is-log: true
+  # jwt秘钥
+  jwt-secret-key: SGSIDNgdsgisdgdfinnnsdfsd
+
+
+spring.mail:
+  host: smtp.163.com
+  username: yunlu29817@163.com
+  password: JUQIJYNAEEIMDGTR
+  default-encoding: utf-8
+  properties:
+    mail:
+      smtp:
+        auth: true
+        starttls:
+          enable: true
+          required: true
+mzw:
+  password-key: XNo+yudRDxYCtG2k
+
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml
