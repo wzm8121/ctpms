@@ -5,6 +5,7 @@ import com.mzw.ctpmsbackend.common.utils.EncryptUtil;
 import com.mzw.ctpmsbackend.exception.ServiceException;
 import com.mzw.ctpmsbackend.service.ImageUploadService;
 import lombok.extern.slf4j.Slf4j;
+import org.nd4j.common.io.StringUtils;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.HttpHeaders;
@@ -82,10 +83,12 @@ public class UserServiceImpl implements UserService {
             user.setStudentId(studentId);
 
             String salt = UUID.randomUUID().toString().replace("-", "").substring(0, 16);
-            String finalKey = passwordKey + salt;
-            String ciphertext = EncryptUtil.encrypt(finalKey, user.getPasswordHash());
+            String ciphertext = EncryptUtil.encrypt(salt, user.getPasswordHash());
 
             user.setSalt(salt);
+            user.setRole("user");
+            user.setSchoolId(1);
+            user.setStatus(1);
             user.setPasswordHash(ciphertext);
             user.setCreatedAt(LocalDateTime.now());
             user.setUpdatedAt(LocalDateTime.now());
@@ -170,20 +173,32 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public IPage<User> searchUsers(int page, int size, String keyword) throws ServiceException{
+    public IPage<User> searchUsers(int page, int size, String keyword, String type) throws ServiceException {
         try {
+            if (page < 1) page = 1;
+            if (size < 1 || size > 100) size = 10;
+
             QueryWrapper<User> query = new QueryWrapper<>();
-            if (keyword != null && !keyword.trim().isEmpty()) {
-                query.like("user_id", keyword)
-                        .or().like("real_name", keyword)
-                        .or().like("phone", keyword);
+            if (StringUtils.hasText(keyword) && StringUtils.hasText(type)) {
+                switch (type) {
+                    case "username":
+                        query.lambda().like(User::getUsername, keyword);
+                        break;
+                    case "phone":
+                        query.lambda().like(User::getPhone, keyword);
+                        break;
+                    default:
+                        throw new ServiceException("不支持的查询类型：" + type);
+                }
             }
-            return userMapper.selectPage(new Page<>(page, size), query);
+
+            return userMapper.selectPage(new Page<>(page, size), query.orderByDesc("created_at"));
         } catch (Exception e) {
             log.error("搜索用户失败: {}", keyword, e);
             throw new ServiceException("搜索用户失败", e);
         }
     }
+
 
     @Override
     public void sendVerificationCode(String email) throws ServiceException{
@@ -291,7 +306,7 @@ public class UserServiceImpl implements UserService {
             }
 
             SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom("yunlu29817@163.com");
+            message.setFrom("lxy2914344878@163.com");
             message.setTo(to);
             message.setSubject(subject);
             message.setText(text);

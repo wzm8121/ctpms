@@ -105,14 +105,15 @@ public class UserVerificationController {
     }
 
     @ApiOperation("分页模糊搜索用户证件审核记录")
-    @GetMapping("/search")
+    @GetMapping("/search/{type}")
     @SaCheckRole("admin")
     public DataResult<IPage<UserVerification>> searchVerifications(
+            @PathVariable("type") String type,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String keyword) {
         try {
-            IPage<UserVerification> result = userVerificationService.searchUserVerifications(page, size, keyword);
+            IPage<UserVerification> result = userVerificationService.searchUserVerifications(page, size, keyword,type);
             return DataResult.success("搜索用户证件审核记录",result);
         } catch (ServiceException e) {
             return DataResult.fail(e.getMessage());

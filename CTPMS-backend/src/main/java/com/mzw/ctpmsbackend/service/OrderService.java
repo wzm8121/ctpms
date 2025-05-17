@@ -33,8 +33,8 @@ public interface OrderService {
 
     Order getOrderById(String orderId);
 
-    IPage<OrderVO> getOrderList(int page, int size, Long userId);
+    IPage<OrderVO> getOrderList(int page, int size, Integer userId);
 
-    IPage<OrderVO> searchOrders(int page, int size, String keyword, Long userId);
+    IPage<OrderVO> searchOrders(int page, int size, String keyword, String type, Integer userId);
 
 }

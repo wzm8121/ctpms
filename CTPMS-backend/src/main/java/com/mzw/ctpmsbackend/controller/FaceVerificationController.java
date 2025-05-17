@@ -176,24 +176,25 @@ public class FaceVerificationController {
     }
 
     @ApiOperation("搜索审核记录")
-    @GetMapping("/search")
+    @GetMapping("/search/{type}")
     @SaCheckRole("admin")
     public DataResult<IPage<FaceReview>> searchVerifications(
+            @PathVariable("type") String type,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String keyword) {
         try {
             IPage<FaceReview> verifications =
-                    faceVerificationService.searchVerifications(page, size, keyword);
-            return DataResult.success("搜索审核记录成功",verifications);
+                    faceVerificationService.searchVerifications(page, size, keyword, type);
+            return DataResult.success("搜索审核记录成功", verifications);
         } catch (ServiceException e) {
             return DataResult.error(e.getMessage());
         }
     }
 
+
     @ApiOperation("查询用户人脸认证状态")
     @GetMapping("/status")
-    @OperationLog(type = "FACE_VERIFICATION", value = "查询用户人脸认证状态")
     public DataResult<Boolean> getVerificationsStatus() {
         try {
             Integer userId = StpUtil.getLoginIdAsInt();

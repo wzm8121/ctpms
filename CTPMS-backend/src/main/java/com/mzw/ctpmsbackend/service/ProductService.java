@@ -43,7 +43,7 @@ public interface ProductService {
      * @return 更新后的商品信息
      * @throws ServiceException 当商品不存在或更新失败时抛出
      */
-    Product updateProduct(ProductDTO productDTO) throws ServiceException;
+    void updateProduct(ProductDTO productDTO) throws ServiceException;
 
     /**
      * 根据ID获取商品详情
@@ -70,7 +70,7 @@ public interface ProductService {
      * @return 分页搜索结果
      * @throws ServiceException 当查询失败时抛出
      */
-    IPage<ProductVO> searchProducts(int page, int size, String keyword) throws ServiceException;
+    IPage<ProductVO> searchProducts(int page, int size, String keyword, String type) throws ServiceException;
 
 
 }

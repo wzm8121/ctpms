@@ -29,13 +29,6 @@ public class LogController {
     @Resource
     private LogService logService;
 
-    @ApiOperation("测试日志")
-    @OperationLog(value = "测试日志", type = "TEST")
-    @GetMapping("/test-log")
-    public DataResult<String> testLog() {
-        return DataResult.success("这是一条测试日志");
-    }
-
     // ==================== 用户操作日志 ====================
 
     @ApiOperation("分页查询用户操作日志")
@@ -52,13 +45,14 @@ public class LogController {
     }
 
     @ApiOperation("搜索用户操作日志")
-    @GetMapping("/user-operations/search")
+    @GetMapping("/user-operations/search/{type}")
     public DataResult<IPage<UserOperationLog>> searchUserOperationLogs(
+            @PathVariable("type") String type,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String keyword) {
         try {
-            IPage<UserOperationLog> result = logService.searchUserOperationLogs(page, size, keyword);
+            IPage<UserOperationLog> result = logService.searchUserOperationLogs(page, size, keyword, type);
             return DataResult.success(result);
         } catch (ServiceException e) {
             return DataResult.error(e.getMessage());
@@ -107,13 +101,14 @@ public class LogController {
     }
 
     @ApiOperation("搜索交易日志")
-    @GetMapping("/transactions/search")
+    @GetMapping("/transactions/search/{type}")
     public DataResult<IPage<TransactionLogEntity>> searchTransactionLogs(
+            @PathVariable("type") String type,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String keyword) {
         try {
-            IPage<TransactionLogEntity> result = logService.searchTransactionLogs(page, size, keyword);
+            IPage<TransactionLogEntity> result = logService.searchTransactionLogs(page, size, keyword, type);
             return DataResult.success(result);
         } catch (ServiceException e) {
             return DataResult.error(e.getMessage());
@@ -162,13 +157,14 @@ public class LogController {
     }
 
     @ApiOperation("搜索管理员审核日志")
-    @GetMapping("/admin-audits/search")
+    @GetMapping("/admin-audits/search/{type}")
     public DataResult<IPage<AdminAuditLog>> searchAdminAuditLogs(
+            @PathVariable("type") String type,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String keyword) {
         try {
-            IPage<AdminAuditLog> result = logService.searchAdminAuditLogs(page, size, keyword);
+            IPage<AdminAuditLog> result = logService.searchAdminAuditLogs(page, size, keyword, type);
             return DataResult.success(result);
         } catch (ServiceException e) {
             return DataResult.error(e.getMessage());

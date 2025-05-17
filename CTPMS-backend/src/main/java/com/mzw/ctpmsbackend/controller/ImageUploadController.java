@@ -20,7 +20,6 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("/api/image")
 @Api(tags = "图片管理")
-@SaCheckLogin
 public class ImageUploadController {
 
     @Resource

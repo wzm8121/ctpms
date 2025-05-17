@@ -103,8 +103,8 @@ public class ProductController {
                 return DataResult.error("无权限修改他人商品");
             }
 
-            Product updated = productService.updateProduct(productDTO);
-            return DataResult.success("商品更新成功", updated);
+            productService.updateProduct(productDTO);
+            return DataResult.success("商品更新成功");
         } catch (ServiceException e) {
             return DataResult.error(e.getMessage());
         }
@@ -161,16 +161,18 @@ public class ProductController {
      */
     @ApiOperation("搜索商品")
     @SaCheckLogin
-    @GetMapping("/search")
+    @GetMapping("/search/{type}")
     public DataResult<IPage<ProductVO>> searchProducts(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String keyword) {
+            @RequestParam(required = false) String keyword,
+            @PathVariable("type") String type) {
         try {
-            return DataResult.success(productService.searchProducts(page, size, keyword));
+            return DataResult.success(productService.searchProducts(page, size, keyword, type));
         } catch (ServiceException e) {
             return DataResult.error(e.getMessage());
         }
     }
+
 }
 

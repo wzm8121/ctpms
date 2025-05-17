@@ -67,7 +67,7 @@ public interface UserService {
      * @return 分页搜索结果
      * @throws ServiceException 当查询失败时抛出
      */
-    IPage<User> searchUsers(int page, int size, String keyword) throws ServiceException;
+    IPage<User> searchUsers(int page, int size, String keyword, String type) throws ServiceException;
 
     /**
      * 发送验证码到邮箱

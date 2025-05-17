@@ -13,7 +13,7 @@ import lombok.Data;
 public class UserVerificationDTO {
 
     private Integer verificationId;
-    private Integer studentId;
+    private Integer userId;
     private String idCardName;
     private String idCardNumber;
 

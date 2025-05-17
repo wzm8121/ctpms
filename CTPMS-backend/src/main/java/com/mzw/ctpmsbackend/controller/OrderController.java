@@ -151,7 +151,7 @@ public class OrderController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        Long loginUserId = StpUtil.getLoginIdAsLong();
+        Integer loginUserId = StpUtil.getLoginIdAsInt();
 
         // 管理员查询所有订单，普通用户查询自己的订单
         IPage<OrderVO> orders;
@@ -165,25 +165,27 @@ public class OrderController {
     }
 
     @SaCheckLogin
-    @GetMapping("/search")
+    @GetMapping("/search/{type}")
     @ApiOperation("搜索订单")
     public DataResult<IPage<OrderVO>> searchOrders(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String keyword) {
+            @RequestParam(required = false) String keyword,
+            @PathVariable("type") String type) {
 
-        Long loginUserId = StpUtil.getLoginIdAsLong();
+        Integer loginUserId = StpUtil.getLoginIdAsInt();
 
         // 管理员可以搜索所有订单，普通用户只能搜索自己的订单
         IPage<OrderVO> orders;
         if (StpUtil.hasRole("admin")) {
-            orders = orderService.searchOrders(page, size, keyword, null);
+            orders = orderService.searchOrders(page, size, keyword, type, null);
         } else {
-            orders = orderService.searchOrders(page, size, keyword, loginUserId);
+            orders = orderService.searchOrders(page, size, keyword, type, loginUserId);
         }
 
         return DataResult.success(orders);
     }
+
 
 
 }

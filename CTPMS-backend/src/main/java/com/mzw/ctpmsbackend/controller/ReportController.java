@@ -96,14 +96,15 @@ public class ReportController {
 
 
     @ApiOperation("分页搜索投诉记录(管理员)")
-    @GetMapping("/search")
+    @GetMapping("/search/{type}")
     @SaCheckRole("admin")
     public DataResult<IPage<Report>> searchReports(
+            @PathVariable("type") String type,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam String keyword) {
+            @RequestParam String keyword){
         try {
-            IPage<Report> result = reportService.searchReports(page, size, keyword);
+            IPage<Report> result = reportService.searchReports(page, size, keyword,type);
             return DataResult.success(result);
         } catch (ServiceException e) {
             return DataResult.error(e.getMessage());

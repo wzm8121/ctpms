@@ -1,5 +1,6 @@
 package com.mzw.ctpmsbackend.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mzw.ctpmsbackend.entity.ProductImage;
 import com.mzw.ctpmsbackend.mapper.ProductImageMapper;
@@ -13,11 +14,12 @@ import java.util.List;
 public class ProductImageServiceImpl extends ServiceImpl<ProductImageMapper, ProductImage>
         implements ProductImageService {
 
+
     @Override
-    public boolean saveBatch(List<ProductImage> imageList) {
-        if (CollectionUtils.isEmpty(imageList)) {
-            return false;
-        }
-        return this.saveBatch(imageList);
+    public void removeByProductId(Integer productId) {
+        LambdaQueryWrapper<ProductImage> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ProductImage::getProductId, productId);
+        this.remove(wrapper);
     }
+
 }

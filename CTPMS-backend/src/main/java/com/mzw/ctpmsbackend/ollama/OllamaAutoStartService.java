@@ -13,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 public class OllamaAutoStartService implements CommandLineRunner {
 
-    private static final String MODEL_NAME = "deepseek-r1:7b";
+    private static final String MODEL_NAME = "deepseek-r1:1.5b";
 
     @Override
     public void run(String... args) {

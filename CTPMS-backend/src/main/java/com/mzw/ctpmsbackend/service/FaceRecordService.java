@@ -70,5 +70,5 @@ public interface FaceRecordService {
      * @return 人脸识别记录分页列表
      * @throws ServiceException 如果搜索失败抛出业务异常
      */
-    IPage<FaceRecordDTO> searchFaceRecords(String keyword, int page, int size) throws ServiceException;
+    IPage<FaceRecordDTO> searchFaceRecords(int page, int size,String keyword, String searchType) throws ServiceException;
 }

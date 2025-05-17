@@ -16,7 +16,7 @@ public class OllamaServiceImpl implements OllamaService {
     @Override
     public String chat(String prompt) throws IOException {
         String json = "{\n" +
-                "  \"model\": \"deepseek-r1:7b\",\n" +
+                "  \"model\": \"deepseek-r1:1.5b\",\n" +
                 "  \"messages\": [\n" +
                 "    {\"role\": \"user\", \"content\": \"" + prompt + "\"}\n" +
                 "  ],\n" +

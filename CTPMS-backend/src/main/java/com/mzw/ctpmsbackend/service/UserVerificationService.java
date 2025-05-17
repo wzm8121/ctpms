@@ -42,7 +42,7 @@ public interface UserVerificationService {
     /**
      * 关键字搜索认证记录
      */
-    IPage<UserVerification> searchUserVerifications(int page, int size, String keyword) throws ServiceException;
+    IPage<UserVerification> searchUserVerifications(int page, int size, String keyword,String type) throws ServiceException;
 
     /**
      * 获取所有待审核的认证信息

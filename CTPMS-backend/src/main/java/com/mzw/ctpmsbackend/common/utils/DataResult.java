@@ -24,7 +24,15 @@ public class DataResult<T> {
     }
 
     public static <T> DataResult<T> error(String message) {
-        return new DataResult<>(500, message, null);
+        return new DataResult<>(500, message,null);
+    }
+
+    public static <T> DataResult<T> error(String message,T data) {
+        return new DataResult<>(500, message, data);
+    }
+
+    public static <T> DataResult<T> error(Integer code,String message) {
+        return new DataResult<>(code, message, null);
     }
 
     public static <T> DataResult<T> fail(String message) {

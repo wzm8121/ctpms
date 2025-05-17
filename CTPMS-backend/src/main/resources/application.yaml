@@ -4,6 +4,25 @@ server:
   port: 3000
 
 spring:
+  # 邮件服务配置
+  mail:
+    host: smtp.163.com
+    port: 465
+    protocol: smtp
+    username: lxy2914344878@163.com
+    password: RPdMAKK6JsLBkNbX
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          ssl: true
+          timeout: 5000
+          connectiontimeout: 5000
+          socketFactory:
+            port: 465
+            class: javax.net.ssl.SSLSocketFactory
   jpa:
     open-in-view: false
 
@@ -98,18 +117,7 @@ sa-token:
   jwt-secret-key: SGSIDNgdsgisdgdfinnnsdfsd
 
 
-spring.mail:
-  host: smtp.163.com
-  username: yunlu29817@163.com
-  password: JUQIJYNAEEIMDGTR
-  default-encoding: utf-8
-  properties:
-    mail:
-      smtp:
-        auth: true
-        starttls:
-          enable: true
-          required: true
+
 mzw:
   password-key: XNo+yudRDxYCtG2k
 

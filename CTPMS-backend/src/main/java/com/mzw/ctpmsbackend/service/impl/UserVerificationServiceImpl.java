@@ -138,25 +138,29 @@ public class UserVerificationServiceImpl extends ServiceImpl<UserVerificationMap
     }
 
     @Override
-    public IPage<UserVerification> searchUserVerifications(int page, int size, String keyword) throws ServiceException {
+    public IPage<UserVerification> searchUserVerifications(int page, int size, String keyword, String type) throws ServiceException {
         try {
             if (page < 1) page = 1;
             if (size < 1 || size > 100) size = 10;
 
-            QueryWrapper<UserVerification> queryWrapper = new QueryWrapper<>();
-            if (StringUtils.hasText(keyword)) {
-                queryWrapper.lambda()
-                        .like(UserVerification::getIdCardName, keyword)
-                        .or()
-                        .like(UserVerification::getIdCardNumber, keyword)
-                        .or()
-                        .like(UserVerification::getStudentId, keyword);
+            QueryWrapper<UserVerification> query = new QueryWrapper<>();
+            if (StringUtils.hasText(keyword) && StringUtils.hasText(type)) {
+                switch (type) {
+                    case "idCardName":
+                        query.lambda().like(UserVerification::getIdCardName, keyword);
+                        break;
+                    case "userId":
+                        query.lambda().like(UserVerification::getUserId, keyword);
+                        break;
+                    default:
+                        throw new ServiceException("不支持的查询类型：" + type);
+                }
             }
 
-            return this.page(new Page<>(page, size), queryWrapper.orderByDesc("created_at"));
+            return this.page(new Page<>(page, size), query.orderByDesc("created_at"));
         } catch (Exception e) {
-            log.error("搜索用户认证记录失败", e);
-            throw new ServiceException("搜索用户认证记录失败: " + e.getMessage());
+            log.error("搜索用户认证记录失败: {}", keyword, e);
+            throw new ServiceException("搜索用户认证记录失败", e);
         }
     }
 

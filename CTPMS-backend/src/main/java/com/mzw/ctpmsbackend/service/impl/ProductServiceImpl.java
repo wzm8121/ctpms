@@ -66,6 +66,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
             BeanUtils.copyProperties(dto, product);
             product.setUserId(UserId);
             product.setStatus(0); // 未审核
+            product.setCreatedAt(LocalDateTime.now());
             this.save(product);
 
             // 2. 保存图片
@@ -77,8 +78,6 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
                     image.setIsMain(imageDTO.getIsMain() != 1 ? 0 : 1);
                     return image;
                 }).collect(Collectors.toList());
-
-                System.out.println("测试插入图片中");
                 productImageService.saveBatch(images);
             }
 
@@ -87,6 +86,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
             message.setProductId(product.getProductId());
             message.setTitle(product.getTitle());
             message.setDescription(product.getDescription());
+            message.setTags(product.getTags());
             productMessageSender.sendProductForReview(message); // 发送审核消息
 
         } catch (Exception e) {
@@ -112,7 +112,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
             }
 
             // 2. 修改状态为 "已下架"（而不是物理删除）
-            product.setStatus(2); // 2表示已下架
+            product.setStatus(3); // 3表示已下架
             productMapper.updateById(product);
 
             log.info("商品删除成功，ID: {}", id);
@@ -125,35 +125,45 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Product updateProduct(ProductDTO productDTO) throws ServiceException {
+    public void updateProduct(ProductDTO productDTO) throws ServiceException {
         try {
-            // 参数校验
             if (productDTO == null || productDTO.getProductId() == null) {
                 throw new ServiceException("商品信息不完整");
             }
 
-            // 检查商品是否存在
             Product existingProduct = this.getById(productDTO.getProductId());
             if (existingProduct == null) {
                 throw new ServiceException("商品不存在");
             }
 
-            // 转换实体
             Product product = convertToEntity(productDTO);
             product.setUpdatedAt(LocalDateTime.now());
 
-            // 更新商品
             if (!this.updateById(product)) {
                 throw new ServiceException("商品更新失败");
             }
 
+            // 替换图片：先删除原图，再插入新图
+            productImageService.removeByProductId(product.getProductId());
+
+            if (productDTO.getImages() != null && !productDTO.getImages().isEmpty()) {
+                List<ProductImage> images = productDTO.getImages().stream().map(imageDTO -> {
+                    ProductImage image = new ProductImage();
+                    image.setProductId(product.getProductId());
+                    image.setImageUrl(imageDTO.getImageUrl());
+                    image.setIsMain(imageDTO.getIsMain() != 1 ? 0 : 1);
+                    return image;
+                }).collect(Collectors.toList());
+                productImageService.saveBatch(images);
+            }
+
             log.info("商品更新成功，ID: {}", product.getProductId());
-            return product;
         } catch (Exception e) {
             log.error("商品更新失败: {}", e.getMessage());
             throw new ServiceException("商品更新失败: " + e.getMessage());
         }
     }
+
 
     @Override
     public ProductVO getProduct(Integer id) throws ServiceException {
@@ -203,19 +213,25 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
     }
 
     @Override
-    public IPage<ProductVO> searchProducts(int page, int size, String keyword) throws ServiceException {
+    public IPage<ProductVO> searchProducts(int page, int size, String keyword, String type) throws ServiceException {
         try {
             if (page < 1) page = 1;
             if (size < 1 || size > 100) size = 10;
 
             QueryWrapper<Product> queryWrapper = new QueryWrapper<>();
-            if (StringUtils.hasText(keyword)) {
+            if (StringUtils.hasText(keyword) && StringUtils.hasText(type)) {
                 if (keyword.length() > 50) {
                     throw new ServiceException("搜索关键词过长");
                 }
-                queryWrapper.like("title", keyword)
-                        .or().like("description", keyword)
-                        .or().eq("product_id", keyword);
+
+                switch (type) {
+                    case "title":
+                        queryWrapper.like("title", keyword);
+                        break;
+                    case "productId":
+                        queryWrapper.eq("product_id", keyword);
+                        break;
+                }
             }
 
             Page<Product> productPage = this.page(
@@ -237,6 +253,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
             throw new ServiceException("搜索商品失败: " + e.getMessage());
         }
     }
+
 
 
 

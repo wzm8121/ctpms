@@ -110,14 +110,15 @@ public class BlacklistController {
      * @return 搜索结果
      */
     @SaCheckRole("admin")
-    @GetMapping("/search")
+    @GetMapping("/search/{type}")
     @ApiOperation("搜索黑名单记录")
     public DataResult<IPage<Blacklist>> searchBlacklist(
+            @PathVariable("type") String type,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String keyword) {
+            @RequestParam (required = false) String keyword) {
         try {
-            IPage<Blacklist> result = blacklistService.searchBlacklist(page, size, keyword);
+            IPage<Blacklist> result = blacklistService.searchBlacklist(page, size, keyword, type);
             return DataResult.success(result);
         } catch (ServiceException e) {
             return DataResult.error(e.getMessage());

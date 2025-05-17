@@ -276,20 +276,28 @@ public class FaceVerificationServiceImpl extends ServiceImpl<FaceVerificationMap
     }
 
     @Override
-    public IPage<FaceReview> searchVerifications(int page, int size, String keyword) throws ServiceException {
+    public IPage<FaceReview> searchVerifications(int page, int size, String keyword, String searchType) throws ServiceException {
         try {
             if (page < 1) page = 1;
             if (size < 1 || size > 100) size = 10;
 
             QueryWrapper<FaceReview> queryWrapper = new QueryWrapper<>();
-            if (StringUtils.hasText(keyword)) {
+            if (StringUtils.hasText(keyword) && StringUtils.hasText(searchType)) {
                 if (keyword.length() > 50) {
                     throw new ServiceException("搜索关键词过长");
                 }
-                queryWrapper.like("user_id", keyword)
-                        .or().like("face_image_url", keyword)
-                        .or().like("verified_by", keyword);
+                switch (searchType) {
+                    case "userId":
+                        queryWrapper.like("user_id", keyword);
+                        break;
+                    case "status":
+                        queryWrapper.like("status", keyword);
+                        break;
+                    default:
+                        throw new ServiceException("不支持的搜索类型: " + searchType);
+                }
             }
+
             return page(new Page<>(page, size),
                     queryWrapper.orderByDesc("created_at"));
         } catch (Exception e) {
@@ -297,6 +305,7 @@ public class FaceVerificationServiceImpl extends ServiceImpl<FaceVerificationMap
             throw new ServiceException("搜索记录失败：" + e.getMessage());
         }
     }
+
 
     public boolean getUserFaceVerificationStatus(Integer userId) throws ServiceException {
         try {

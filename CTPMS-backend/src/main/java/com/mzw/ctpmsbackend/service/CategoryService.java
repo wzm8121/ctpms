@@ -69,7 +69,7 @@ public interface CategoryService extends IService<Category> {
      * @return 分类分页结果
      * @throws ServiceException 如果搜索失败抛出业务异常
      */
-    IPage<Category> searchCategories(int page, int size, String keyword) throws ServiceException;
+    IPage<Category> searchCategories(int page, int size, String keyword,String type) throws ServiceException;
 
     /**
      * 获取分类树结构

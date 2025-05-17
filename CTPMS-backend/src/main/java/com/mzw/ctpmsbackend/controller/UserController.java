@@ -126,14 +126,15 @@ public class UserController {
      * 用户搜索（仅管理员）
      */
     @SaCheckRole("admin")
-    @GetMapping("/search")
+    @GetMapping("/search/{type}")
     @ApiOperation("搜索用户")
     public DataResult<IPage<User>> searchUsers(
+            @PathVariable("type") String type,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String keyword) {
         try {
-            IPage<User> result = userService.searchUsers(page, size, keyword);
+            IPage<User> result = userService.searchUsers(page, size, keyword,type);
             return DataResult.success(result);
         } catch (ServiceException e) {
             return DataResult.error(e.getMessage());

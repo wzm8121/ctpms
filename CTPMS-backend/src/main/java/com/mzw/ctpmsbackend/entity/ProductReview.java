@@ -12,6 +12,7 @@ import java.util.Date;
 @Data
 @TableName("product_review")
 public class ProductReview {
+    @TableId(type = IdType.AUTO) // 自动递增
     private Integer id;
     private Integer productId;
     private Integer status;       // 1=通过，2=失败

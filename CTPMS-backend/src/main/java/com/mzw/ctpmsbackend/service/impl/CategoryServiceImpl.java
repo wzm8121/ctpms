@@ -116,13 +116,22 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
     }
 
     @Override
-    public IPage<Category> searchCategories(int page, int size, String keyword) throws ServiceException {
+    public IPage<Category> searchCategories(int page, int size, String keyword, String type) throws ServiceException {
         try {
             Page<Category> pageParam = new Page<>(page, size);
             QueryWrapper<Category> queryWrapper = new QueryWrapper<>();
 
-            if (StringUtils.hasText(keyword)) {
-                queryWrapper.like("name", keyword);
+            if (StringUtils.hasText(keyword) && StringUtils.hasText(type)) {
+                switch (type) {
+                    case "name":
+                        queryWrapper.like("name", keyword);
+                        break;
+                    case "categoryId":
+                        queryWrapper.like("category_id", keyword);
+                        break;
+                    default:
+                        throw new ServiceException("不支持的搜索类型: " + type);
+                }
             }
             return this.page(pageParam, queryWrapper);
         } catch (Exception e) {

@@ -41,7 +41,7 @@ import java.io.IOException;
 @RequestMapping("/api/face")
 @SaCheckLogin
 public class FaceRecognitionController {
-    private static final String FLASK_SERVER_URL = "http://10.8.0.10:5000";
+    private static final String FLASK_SERVER_URL = "http://121.40.250.141:5000";
     private static final Logger logger = LoggerFactory.getLogger(FaceRecognitionController.class);
 
     @Resource
@@ -85,7 +85,7 @@ public class FaceRecognitionController {
             }
         } catch (Exception e) {
             logger.error("注册人脸失败: ", e);
-            return DataResult.fail("注册人脸失败: " + e.getMessage());
+            return DataResult.error("注册人脸失败: " + e.getMessage());
         }
     }
 
@@ -93,13 +93,13 @@ public class FaceRecognitionController {
     @ApiOperation("人脸验证")
     @PostMapping("/verify")
     @OperationLog(type = "FACE_RECOGNITION", value = "人脸验证")
-    public DataResult<FaceReview> verifyFace(@RequestParam("file") MultipartFile file) {
+    public DataResult<?> verifyFace(@RequestParam("file") MultipartFile file) {
         try (CloseableHttpClient client = HttpClients.createDefault()) {
             Integer loginId = StpUtil.getLoginIdAsInt();
             User user = userMapper.selectById(loginId);
             Integer faceVerified = user.getFaceVerified();
             if (faceVerified == 0) {
-                return DataResult.success("验证人脸失败：未通过人脸认证");
+                return DataResult.error("验证人脸失败：未通过人脸认证");
             }
             HttpPost httpPost = new HttpPost(FLASK_SERVER_URL + "/verify");
 
@@ -125,12 +125,12 @@ public class FaceRecognitionController {
 
                 // **如果 Flask 返回 error，直接返回错误信息**
                 if ("error".equals(status)) {
-                    return DataResult.fail("人脸验证失败: " + message);
+                    return DataResult.error("人脸验证失败,置信度: " + confidence);
                 }
 
                 int loginUserId = StpUtil.getLoginIdAsInt();
                 if (userId != loginUserId){
-                    return DataResult.fail("验证人脸与登录用户不匹配: " + message);
+                    return DataResult.error("验证人脸与登录用户不匹配，匹配到的人脸 " + userId);
                 }
                 // 添加人脸识别记录
 
@@ -156,7 +156,7 @@ public class FaceRecognitionController {
             }
         } catch (Exception e) {
             logger.error("Error in verifyFace: ", e);
-            return DataResult.fail("验证人脸失败: " + e.getMessage());
+            return DataResult.error("验证人脸失败: " + e.getMessage());
         }
     }
 

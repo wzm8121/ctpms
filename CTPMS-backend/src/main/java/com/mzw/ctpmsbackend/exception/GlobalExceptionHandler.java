@@ -11,11 +11,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NotLoginException.class)
     public DataResult<String> handleNotLoginException(NotLoginException e) {
-        return DataResult.error("访问api失败:" + e.getMessage());
+        return DataResult.error(401,"访问api失败:" + e.getMessage());
     }
 
     @ExceptionHandler(NotRoleException.class)
-    public DataResult<String> handleNotLoginException(NotRoleException e) {
-        return DataResult.error("访问api失败:" + e.getMessage());
+    public DataResult<String> handleNotRoleException(NotRoleException e) {
+        return DataResult.error(402,"访问api失败:" + e.getMessage());
     }
 }

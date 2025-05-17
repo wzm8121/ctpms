@@ -168,7 +168,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public IPage<OrderVO> getOrderList(int page, int size, Long userId) {
+    public IPage<OrderVO> getOrderList(int page, int size, Integer userId) {
         Page<Order> orderPage = new Page<>(page, size);
         LambdaQueryWrapper<Order> wrapper = new LambdaQueryWrapper<>();
         if (userId != null) {
@@ -181,21 +181,31 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public IPage<OrderVO> searchOrders(int page, int size, String keyword, Long userId) {
+    public IPage<OrderVO> searchOrders(int page, int size, String keyword, String type, Integer userId) {
         Page<Order> orderPage = new Page<>(page, size);
         LambdaQueryWrapper<Order> wrapper = new LambdaQueryWrapper<>();
+
         if (userId != null) {
             wrapper.eq(Order::getUserId, userId);
         }
-        if (StrUtil.isNotBlank(keyword)) {
-            wrapper.and(w -> w.like(Order::getOrderId, keyword)
-                    .or().like(Order::getDeliveryAddress, keyword));
+
+        if (StrUtil.isNotBlank(keyword) && StrUtil.isNotBlank(type)) {
+            switch (type) {
+                case "orderId":
+                    wrapper.like(Order::getOrderId, keyword);
+                    break;
+                case "userId":
+                    wrapper.like(Order::getUserId, keyword);
+                    break;
+            }
         }
+
         wrapper.orderByDesc(Order::getCreatedAt);
 
         IPage<Order> rawPage = orderMapper.selectPage(orderPage, wrapper);
-        return enrichOrders(rawPage); // 返回 IPage<OrderVO>
+        return enrichOrders(rawPage);
     }
+
 
 
     private IPage<OrderVO> enrichOrders(IPage<Order> ordersPage) {

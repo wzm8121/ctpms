@@ -132,14 +132,15 @@ public class CategoryController {
      * @return 分类列表
      */
     @SaIgnore
-    @GetMapping("/search")
+    @GetMapping("/search/{type}")
     @ApiOperation("搜索分类")
     public DataResult<IPage<Category>> searchCategories(
+            @PathVariable("type") String type,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String keyword) {
         try {
-            IPage<Category> result = categoryService.searchCategories(page, size, keyword);
+            IPage<Category> result = categoryService.searchCategories(page, size, keyword,type);
             return DataResult.success(result);
         } catch (ServiceException e) {
             return DataResult.error(e.getMessage());

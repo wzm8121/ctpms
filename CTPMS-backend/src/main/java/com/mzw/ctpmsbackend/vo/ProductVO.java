@@ -16,7 +16,7 @@ public class ProductVO {
 
     private String description; // 商品描述
 
-    private Long categoryId; // 分类ID
+    private Integer categoryId; // 分类ID
 
     private BigDecimal price; // 商品价格
 
@@ -24,7 +24,7 @@ public class ProductVO {
 
     private Integer status; // 商品状态：0-未审核，1-上架，2-已下架
 
-    private Boolean isVirtual; // 是否为虚拟商品
+    private Integer isVirtual; // 是否为虚拟商品
 
     private Integer viewCount; // 浏览量
 

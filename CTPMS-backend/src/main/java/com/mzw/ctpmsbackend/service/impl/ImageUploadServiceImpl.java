@@ -28,7 +28,7 @@ public class ImageUploadServiceImpl implements ImageUploadService {
     private RestTemplate restTemplate;
 
     private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 最大5MB
-    private static final String UPLOAD_URL = "http://123.60.139.233:40027/api/v1/upload"; // 图床API地址
+    private static final String UPLOAD_URL = "http://121.40.250.141:40027/api/v1/upload"; // 图床API地址
 
     @Override
     public String uploadImage(MultipartFile file) throws ServiceException {

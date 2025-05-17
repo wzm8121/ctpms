@@ -11,20 +11,21 @@ import java.util.List;
 public class OrderItemVO {
 
     // 原有字段
-    private Long itemId;
-    private Long orderId;
-    private Long productId;
+    private Integer itemId;
+    private String orderId;
+    private Integer sellerId;
+    private Integer productId;
     private Integer quantity;
     private BigDecimal itemPrice;//成交金额
 
     // 商品详情（来自 products 表）
     private String title;
     private String description;
-    private Long categoryId;
+    private Integer categoryId;
     private BigDecimal price;//商品金额
     private Integer stock;
     private Integer status;
-    private Boolean isVirtual;
+    private Integer isVirtual;
     private Integer viewCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

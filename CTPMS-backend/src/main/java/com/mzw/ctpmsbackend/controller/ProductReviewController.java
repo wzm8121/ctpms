@@ -27,7 +27,7 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/api/product/review")
 @Api(tags = "商品审核管理")
-@SaCheckLogin
+
 public class ProductReviewController {
 
     @Autowired
@@ -50,6 +50,7 @@ public class ProductReviewController {
      * 手动审核
      */
     @PostMapping("/manual")
+    @SaCheckLogin
     public DataResult<String> manualReview(@RequestBody ManualReviewRequest request) {
         try {
             productReviewService.manualReview(request);
@@ -67,6 +68,7 @@ public class ProductReviewController {
     @SaCheckRole("admin")
     @GetMapping("/list")
     @ApiOperation("分页获取商品审核列表")
+    @SaCheckLogin
     public DataResult<IPage<ProductReview>> getCategoryList(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -86,14 +88,16 @@ public class ProductReviewController {
      * @return 分类列表
      */
     @SaCheckRole("admin")
-    @GetMapping("/search")
+    @GetMapping("/search/{type}")
     @ApiOperation("搜索商品审核列表")
+    @SaCheckLogin
     public DataResult<IPage<ProductReview>> searchCategories(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String keyword) {
+            @RequestParam(required = false) String keyword,
+            @PathVariable("type") String type) {
         try {
-            IPage<ProductReview> result = productReviewService.searchReviewPage(page, size, keyword);
+            IPage<ProductReview> result = productReviewService.searchReviewPage(page, size, keyword,type);
             return DataResult.success(result);
         } catch (ServiceException e) {
             return DataResult.error(e.getMessage());
@@ -124,6 +128,7 @@ public class ProductReviewController {
     @DeleteMapping("/delete/{reviewId}")
     @OperationLog(type = "USER", value = "删除审核记录")
     @ApiOperation("删除审核记录")
+    @SaCheckLogin
     public DataResult<Boolean> deleteProductReview(@PathVariable Integer reviewId) {
         try {
             productReviewService.deleteReview(reviewId);

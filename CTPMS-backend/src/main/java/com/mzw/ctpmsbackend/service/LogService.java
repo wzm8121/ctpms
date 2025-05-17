@@ -29,7 +29,7 @@ public interface LogService {
      * @return 分页搜索结果
      * @throws ServiceException 当查询失败时抛出
      */
-    IPage<UserOperationLog> searchUserOperationLogs(int page, int size, String keyword) throws ServiceException;
+    IPage<UserOperationLog> searchUserOperationLogs(int page, int size, String keyword, String searchType) throws ServiceException;
 
     /**
      * 删除单条用户操作日志
@@ -70,7 +70,7 @@ public interface LogService {
      * @return 分页搜索结果
      * @throws ServiceException 当查询失败时抛出
      */
-    IPage<TransactionLogEntity> searchTransactionLogs(int page, int size, String keyword) throws ServiceException;
+    IPage<TransactionLogEntity> searchTransactionLogs(int page, int size, String keyword, String searchType) throws ServiceException;
 
     /**
      * 删除单条交易日志
@@ -111,7 +111,7 @@ public interface LogService {
      * @return 分页搜索结果
      * @throws ServiceException 当查询失败时抛出
      */
-    IPage<AdminAuditLog> searchAdminAuditLogs(int page, int size, String keyword) throws ServiceException;
+    IPage<AdminAuditLog> searchAdminAuditLogs(int page, int size, String keyword, String searchType) throws ServiceException;
 
     /**
      * 删除单条管理员审核日志

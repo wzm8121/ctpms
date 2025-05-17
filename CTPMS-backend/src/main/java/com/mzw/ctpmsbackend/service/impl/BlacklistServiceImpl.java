@@ -98,25 +98,32 @@ public class BlacklistServiceImpl implements BlacklistService {
     }
 
     @Override
-    public IPage<Blacklist> searchBlacklist(int page, int size, String keyword) throws ServiceException {
+    public IPage<Blacklist> searchBlacklist(int page, int size, String keyword, String searchType) throws ServiceException {
         try {
             Page<Blacklist> pageParam = new Page<>(page, size);
             QueryWrapper<Blacklist> queryWrapper = new QueryWrapper<>();
 
-            // 多字段模糊查询
-            if (StringUtils.hasText(keyword)) {
-                queryWrapper.and(wrapper -> wrapper
-                        .like("target_id", keyword)
-                        .or().like("reason", keyword)
-                );
+            if (StringUtils.hasText(keyword) && StringUtils.hasText(searchType)) {
+                switch (searchType) {
+                    case "reason":
+                        queryWrapper.like("reason", keyword);
+                        break;
+                    case "targetId":
+                        queryWrapper.like("target_id", keyword);
+                        break;
+                    default:
+                        throw new ServiceException("不支持的搜索类型: " + searchType);
+                }
             }
 
-            queryWrapper.orderByDesc("created_at"); // 按更新时间倒序
+            queryWrapper.orderByDesc("created_at");
 
             return blacklistMapper.selectPage(pageParam, queryWrapper);
         } catch (Exception e) {
             throw new ServiceException("搜索黑名单失败：" + e.getMessage());
         }
     }
+
+
 }
 

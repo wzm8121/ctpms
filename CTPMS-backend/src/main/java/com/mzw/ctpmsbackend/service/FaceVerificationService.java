@@ -77,7 +77,7 @@ public interface FaceVerificationService {
      * @return 分页搜索结果
      * @throws ServiceException 当参数无效或查询失败时抛出
      */
-    IPage<FaceReview> searchVerifications(int page, int size, String keyword) throws ServiceException;
+    IPage<FaceReview> searchVerifications(int page, int size, String keyword, String searchType) throws ServiceException;
 
     /**
      * 删除认证信息

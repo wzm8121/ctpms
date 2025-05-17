@@ -3,12 +3,14 @@ package com.mzw.ctpmsbackend.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.mzw.ctpmsbackend.dto.ProductImageDTO;
 import lombok.Data;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 商品实体类
@@ -25,7 +27,7 @@ public class Product {
 
     private String description; // 商品描述
 
-    private Long categoryId; // 分类ID
+    private Integer categoryId; // 分类ID
 
     private BigDecimal price; // 商品价格
 
@@ -33,7 +35,7 @@ public class Product {
 
     private Integer status; // 商品状态：0-未审核，1-上架，2-已下架
 
-    private Boolean isVirtual; // 是否为虚拟商品
+    private Integer isVirtual; // 是否为虚拟商品
 
     private Integer viewCount; // 浏览量
 
@@ -42,4 +44,5 @@ public class Product {
     private LocalDateTime createdAt; // 创建时间
 
     private LocalDateTime updatedAt; // 更新时间
+
 }

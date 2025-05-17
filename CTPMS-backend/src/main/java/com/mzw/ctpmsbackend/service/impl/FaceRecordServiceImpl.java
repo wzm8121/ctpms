@@ -114,18 +114,25 @@ public class FaceRecordServiceImpl extends ServiceImpl<FaceRecordMapper, FaceRec
     }
 
     @Override
-    public IPage<FaceRecordDTO> searchFaceRecords(String keyword, int page, int size) throws ServiceException {
+    public IPage<FaceRecordDTO> searchFaceRecords(int page, int size,String keyword, String searchType) throws ServiceException {
         try {
             Page<FaceRecord> pageParam = new Page<>(page, size);
             QueryWrapper<FaceRecord> queryWrapper = new QueryWrapper<>();
 
-            if (StringUtils.hasText(keyword)) {
-                queryWrapper.like("user_id", keyword)
-                        .or().like("result", keyword)
-                        .orderByDesc("created_at");
-            } else {
-                queryWrapper.orderByDesc("created_at");
+            if (StringUtils.hasText(keyword) && StringUtils.hasText(searchType)) {
+                switch (searchType) {
+                    case "userId":
+                        queryWrapper.like("user_id", keyword);
+                        break;
+                    case "result":
+                        queryWrapper.like("result", keyword);
+                        break;
+                    default:
+                        throw new ServiceException("不支持的搜索类型: " + searchType);
+                }
             }
+
+            queryWrapper.orderByDesc("created_at");
 
             IPage<FaceRecord> faceRecordPage = this.page(pageParam, queryWrapper);
             return faceRecordPage.convert(this::convertToDTO);
@@ -133,6 +140,7 @@ public class FaceRecordServiceImpl extends ServiceImpl<FaceRecordMapper, FaceRec
             throw new ServiceException("搜索失败：" + e.getMessage());
         }
     }
+
 
     /**
      * DTO 转实体对象

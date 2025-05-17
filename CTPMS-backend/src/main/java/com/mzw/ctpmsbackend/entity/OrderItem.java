@@ -10,13 +10,16 @@ import java.math.BigDecimal;
 public class OrderItem {
 
     @TableId(value = "item_id", type = IdType.AUTO)
-    private Long itemId;
+    private Integer itemId;
 
     @TableField("order_id")
     private String orderId;
 
+    @TableField("seller_id")
+    private Integer sellerId;
+
     @TableField("product_id")
-    private Long productId;
+    private Integer productId;
 
     @TableField("quantity")
     private Integer quantity;
@@ -24,6 +27,4 @@ public class OrderItem {
     @TableField("price")
     private BigDecimal price;
 
-    @TableField("status")
-    private Integer status;
 }

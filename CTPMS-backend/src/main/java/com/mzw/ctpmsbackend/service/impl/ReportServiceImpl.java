@@ -14,9 +14,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mzw.ctpmsbackend.dto.BlacklistDTO;
 import com.mzw.ctpmsbackend.dto.ReportDTO;
+import com.mzw.ctpmsbackend.entity.Product;
 import com.mzw.ctpmsbackend.entity.Report;
 import com.mzw.ctpmsbackend.entity.User;
 import com.mzw.ctpmsbackend.exception.ServiceException;
+import com.mzw.ctpmsbackend.mapper.ProductMapper;
 import com.mzw.ctpmsbackend.mapper.ReportMapper;
 import com.mzw.ctpmsbackend.mapper.UserMapper;
 import org.nd4j.common.io.StringUtils;
@@ -38,6 +40,9 @@ public class ReportServiceImpl extends ServiceImpl<ReportMapper, Report> impleme
 
     @Resource
     UserMapper userMapper;
+
+    @Resource
+    ProductMapper productMapper;
 
     @Resource
     BlacklistServiceImpl blacklistService;
@@ -159,21 +164,30 @@ public class ReportServiceImpl extends ServiceImpl<ReportMapper, Report> impleme
     }
 
     @Override
-    public IPage<Report> searchReports(int page, int size, String keyword) throws ServiceException {
+    public IPage<Report> searchReports(int page, int size, String keyword, String type) throws ServiceException {
         try {
             if (page < 1) page = 1;
             if (size < 1 || size > 100) size = 10;
 
             QueryWrapper<Report> queryWrapper = new QueryWrapper<>();
-            if (StringUtils.hasText(keyword)) {
+            if (StringUtils.hasText(keyword) && StringUtils.hasText(type)) {
                 if (keyword.length() > 50) {
                     throw new ServiceException("搜索关键词过长");
                 }
 
-                queryWrapper.like("content", keyword)
-                        .or().like("target_id", keyword)
-                        .or().eq("report_id", keyword);
+                switch (type) {
+                    case "content":
+                        queryWrapper.like("content", keyword);
+                        break;
+                    case "targetId":
+                        queryWrapper.like("target_id", keyword);
+                        break;
+                    default:
+                        throw new ServiceException("不支持的查询类型：" + type);
+                }
             }
+
+            queryWrapper.orderByDesc("created_at");
 
             return this.page(new Page<>(page, size), queryWrapper);
         } catch (Exception e) {
@@ -181,6 +195,7 @@ public class ReportServiceImpl extends ServiceImpl<ReportMapper, Report> impleme
             throw new ServiceException("搜索举报失败: " + e.getMessage());
         }
     }
+
 
     @Override
     public boolean approveReport(Integer reportId) throws ServiceException{
@@ -196,8 +211,10 @@ public class ReportServiceImpl extends ServiceImpl<ReportMapper, Report> impleme
         //降低被投诉用户的信誉分，若低于60，加入黑名单
 
         Integer targetId = report.getTargetId();
+        //找到投诉商品
 
-        User user = userMapper.selectById(targetId);
+        Product product = productMapper.selectById(targetId);
+        User user = userMapper.selectById(product.getUserId());
         if (user == null) {
             throw new ServiceException("未找到被投诉用户信息");
         }

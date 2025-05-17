@@ -14,11 +14,8 @@ public class Order {
     @TableId(value = "order_id", type = IdType.INPUT)
     private String orderId;
 
-    @TableField("parent_order_id")
-    private String parentOrderId;
-
     @TableField("user_id")
-    private Long userId;
+    private Integer userId;
 
     @TableField("order_type")
     private Integer orderType;
@@ -41,9 +38,17 @@ public class Order {
     @TableField("updated_at")
     private LocalDateTime updatedAt;
 
+    @TableField("delivery_method")
+    private Integer deliveryMethod;
+
+    @TableField("tracking_number")
+    private String trackingNumber;
+
+    @TableField("delivery_time")
+    private String deliveryTime;
+
+
     // 以下为非数据库字段，仅用于业务封装
-    @TableField(exist = false)
-    private List<Order> subOrders;
 
     @TableField(exist = false)
     private List<OrderItem> items;

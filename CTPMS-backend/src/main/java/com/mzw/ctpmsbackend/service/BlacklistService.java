@@ -51,5 +51,5 @@ public interface BlacklistService {
      * @return 分页结果
      * @throws ServiceException 如果搜索失败抛出业务异常
      */
-    IPage<Blacklist> searchBlacklist(int page, int size, String keyword) throws ServiceException;
+    IPage<Blacklist> searchBlacklist(int page, int size, String keyword, String searchType) throws ServiceException;
 }

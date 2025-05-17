@@ -50,9 +50,23 @@ public class ProductReviewServiceImpl extends ServiceImpl<ProductReviewMapper, P
     @AuditLog(value = "自动审核", type = "AUTO")
     public void autoReview(ProductReviewMessage message) throws ServiceException {
         try {
-            // 1. 组装 prompt
-            String prompt = "请审核以下商品信息是否合规（标题和描述），合规返回“通过”，不合规返回“不通过”，无法判断需要人工处理请返回“人工审核”：\n" +
-                    "标题：" + message.getTitle() + "\n描述：" + message.getDescription() + "\n标签：" + message.getTags();
+            String prompt = """
+            你是一名校园二手交易平台的审核员，负责审核用户发布的商品信息是否合规。
+
+            请根据以下规则进行判断，并严格只返回一个数字（无其他字符）：
+            1：商品信息合规，可以正常上架；
+            2：商品信息涉嫌违规（如涉黄、涉政、虚假信息、违法物品等），不允许上架；
+            3：内容不完整、难以理解、系统异常等情况，建议人工复审。
+
+            注意：请严格按照以上要求，只返回“1”、“2”或“3”，不要添加任何解释说明。
+
+            以下是待审核的商品信息：
+            标题：%s
+            描述：%s
+            标签：%s
+            """.formatted(message.getTitle(), message.getDescription(), message.getTags());
+
+
 
             // 2. 调用 DeepSeek
             String result = ollamaClient.chat(prompt);
@@ -71,21 +85,22 @@ public class ProductReviewServiceImpl extends ServiceImpl<ProductReviewMapper, P
             review.setReviewBy("系统审核");
             review.setCreatedAt(LocalDateTime.now());
 
+            AuditLogContext.setResult(0);
             // 4. 根据审核结果处理
-            if (conclusion.contains("通过")) {
-                productMapper.updateStatus(message.getProductId(), 1);
-                review.setStatus(1);
-                AuditLogContext.setResult(1);
-                AuditLogContext.setReason("审核通过");
-            } else if (conclusion.contains("不通过")) {
+            if (conclusion.contains("3")) {
+                review.setStatus(0); // 未审核
+                AuditLogContext.setResult(3);
+                AuditLogContext.setReason("需要人工审核");
+            } else if (conclusion.contains("2")) {
                 productMapper.updateStatus(message.getProductId(), 2);
                 review.setStatus(2);
                 AuditLogContext.setResult(2);
                 AuditLogContext.setReason("审核不通过");
-            } else if (conclusion.contains("人工审核")) {
-                review.setStatus(0); // 未审核
-                AuditLogContext.setResult(-1);
-                AuditLogContext.setReason("需要人工审核");
+            } else if (conclusion.contains("1")) {
+                productMapper.updateStatus(message.getProductId(), 1);
+                review.setStatus(1);
+                AuditLogContext.setResult(1);
+                AuditLogContext.setReason("审核通过");
             } else {
                 throw new ServiceException("自动审核失败，返回结论无法识别");
             }
@@ -207,28 +222,33 @@ public class ProductReviewServiceImpl extends ServiceImpl<ProductReviewMapper, P
     }
 
     @Override
-    public IPage<ProductReview> searchReviewPage(int page, int size, String keyword) throws ServiceException {
+    public IPage<ProductReview> searchReviewPage(int page, int size, String keyword, String type) throws ServiceException {
         try {
-            // 创建分页对象
             Page<ProductReview> pageParam = new Page<>(page, size);
             QueryWrapper<ProductReview> queryWrapper = new QueryWrapper<>();
 
-            // 多字段模糊搜索
-            if (StringUtils.hasText(keyword)) {
-                queryWrapper.and(wrapper -> wrapper
-                        .like("product_id", keyword)
-                        .or().like("type", keyword)
-                );
+            if (StringUtils.hasText(keyword) && StringUtils.hasText(type)) {
+                switch (type) {
+                    case "product_id":
+                        queryWrapper.like("product_id", keyword);
+                        break;
+                    case "status":
+                        queryWrapper.eq("status", keyword);
+                        break;
+                    default:
+                        throw new ServiceException("不支持的查询类型：" + type);
+                }
             }
 
-            // 默认按创建时间倒序
-            queryWrapper.orderByDesc("created_at");
+            // 优先显示 status = 3 的记录，再按创建时间倒序
+            queryWrapper.orderByDesc("status = 3").orderByDesc("created_at");
 
             return productReviewMapper.selectPage(pageParam, queryWrapper);
         } catch (Exception e) {
             throw new ServiceException("搜索审核记录失败：" + e.getMessage());
         }
     }
+
 
 
     private String extractReason(String result) {

@@ -128,6 +128,20 @@ public class FaceRecordController {
         }
     }
 
+    @SaCheckLogin
+    @SaCheckRole("admin")
+    @GetMapping("/list")
+    @ApiOperation("获取所有人脸识别记录（默认列表）")
+    public DataResult<IPage<FaceRecordDTO>> getAllFaceRecords(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        try {
+            IPage<FaceRecordDTO> result = faceRecordService.searchFaceRecords(page, size, null, null);
+            return DataResult.success(result);
+        } catch (ServiceException e) {
+            return DataResult.error(e.getMessage());
+        }
+    }
     /**
      * 搜索人脸记录
      * @param keyword 搜索关键字
@@ -137,17 +151,19 @@ public class FaceRecordController {
      */
     @SaCheckLogin
     @SaCheckRole("admin")
-    @GetMapping("/search")
+    @GetMapping("/search/{type}")
     @ApiOperation("搜索人脸记录")
     public DataResult<IPage<FaceRecordDTO>> searchFaceRecords(
+            @PathVariable("type") String type,
             @RequestParam(required = false) String keyword,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
         try {
-            IPage<FaceRecordDTO> result = faceRecordService.searchFaceRecords(keyword, page, size);
+            IPage<FaceRecordDTO> result = faceRecordService.searchFaceRecords( page, size,keyword, type);
             return DataResult.success(result);
         } catch (ServiceException e) {
             return DataResult.error(e.getMessage());
         }
     }
+
 }

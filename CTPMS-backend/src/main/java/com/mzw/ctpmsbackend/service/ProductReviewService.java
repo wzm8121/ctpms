@@ -22,7 +22,7 @@ public interface ProductReviewService {
 
     IPage<ProductReview> getReviewPage(int page, int size) throws ServiceException;
 
-    IPage<ProductReview> searchReviewPage(int page, int size, String keyword) throws ServiceException;
+    IPage<ProductReview> searchReviewPage(int page, int size, String keyword, String type) throws ServiceException;
 
     ProductReview getReview(Integer reviewId) throws ServiceException;
 

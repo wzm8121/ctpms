@@ -72,7 +72,7 @@ public interface ReportService {
      * @return 符合搜索条件的投诉列表
      * @throws ServiceException 操作失败时抛出
      */
-    IPage<Report> searchReports(int page, int size, String keyword) throws ServiceException;
+    IPage<Report> searchReports(int page, int size, String keyword, String type) throws ServiceException;
 
     boolean approveReport(Integer reportId) throws ServiceException;
 

@@ -44,18 +44,23 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
-    public IPage<UserOperationLog> searchUserOperationLogs(int page, int size, String keyword) throws ServiceException {
+    public IPage<UserOperationLog> searchUserOperationLogs(int page, int size, String keyword, String searchType) throws ServiceException {
         try {
             Page<UserOperationLog> pageParam = new Page<>(page, size);
             QueryWrapper<UserOperationLog> queryWrapper = new QueryWrapper<UserOperationLog>()
                     .orderByDesc("create_time");
 
-            if (StringUtils.isNotBlank(keyword)) {
-                queryWrapper.and(wrapper -> wrapper
-                        .like("username", keyword)
-                        .or().like("operation", keyword)
-                        .or().like("method", keyword)
-                        .or().like("params", keyword));
+            if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(searchType)) {
+                switch (searchType) {
+                    case "username":
+                        queryWrapper.like("username", keyword);
+                        break;
+                    case "operation":
+                        queryWrapper.like("operation", keyword);
+                        break;
+                    default:
+                        throw new ServiceException("不支持的搜索类型: " + searchType);
+                }
             }
 
             return userOperationLogMapper.selectPage(pageParam, queryWrapper);
@@ -64,6 +69,7 @@ public class LogServiceImpl implements LogService {
             throw new ServiceException("搜索用户操作日志失败: " + e.getMessage());
         }
     }
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -126,17 +132,23 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
-    public IPage<TransactionLogEntity> searchTransactionLogs(int page, int size, String keyword) throws ServiceException {
+    public IPage<TransactionLogEntity> searchTransactionLogs(int page, int size, String keyword, String searchType) throws ServiceException {
         try {
             Page<TransactionLogEntity> pageParam = new Page<>(page, size);
             QueryWrapper<TransactionLogEntity> queryWrapper = new QueryWrapper<TransactionLogEntity>()
                     .orderByDesc("create_time");
 
-            if (StringUtils.isNotBlank(keyword)) {
-                queryWrapper.and(wrapper -> wrapper
-                        .like("transaction_id", keyword)
-                        .or().like("item_name", keyword)
-                        .or().like("remark", keyword));
+            if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(searchType)) {
+                switch (searchType) {
+                    case "fromAccount":
+                        queryWrapper.like("from_account", keyword);
+                        break;
+                    case "description":
+                        queryWrapper.like("description", keyword);
+                        break;
+                    default:
+                        throw new ServiceException("不支持的搜索类型: " + searchType);
+                }
             }
 
             return transactionLogMapper.selectPage(pageParam, queryWrapper);
@@ -145,6 +157,7 @@ public class LogServiceImpl implements LogService {
             throw new ServiceException("搜索交易日志失败: " + e.getMessage());
         }
     }
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -207,18 +220,23 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
-    public IPage<AdminAuditLog> searchAdminAuditLogs(int page, int size, String keyword) throws ServiceException {
+    public IPage<AdminAuditLog> searchAdminAuditLogs(int page, int size, String keyword, String searchType) throws ServiceException {
         try {
             Page<AdminAuditLog> pageParam = new Page<>(page, size);
             QueryWrapper<AdminAuditLog> queryWrapper = new QueryWrapper<AdminAuditLog>()
                     .orderByDesc("create_time");
 
-            if (StringUtils.isNotBlank(keyword)) {
-                queryWrapper.and(wrapper -> wrapper
-                        .like("admin_name", keyword)
-                        .or().like("action", keyword)
-                        .or().like("target_type", keyword)
-                        .or().like("remark", keyword));
+            if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(searchType)) {
+                switch (searchType) {
+                    case "auditorName":
+                        queryWrapper.like("auditor_name", keyword);
+                        break;
+                    case "targetId":
+                        queryWrapper.like("target_id", keyword);
+                        break;
+                    default:
+                        throw new ServiceException("不支持的搜索类型: " + searchType);
+                }
             }
 
             return adminAuditLogMapper.selectPage(pageParam, queryWrapper);
@@ -227,6 +245,7 @@ public class LogServiceImpl implements LogService {
             throw new ServiceException("搜索管理员审核日志失败: " + e.getMessage());
         }
     }
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)

@@ -16,7 +16,7 @@ public class UserVerification {
     @TableId(value = "verification_id", type = IdType.AUTO)
     private Integer verificationId; // 主键ID
 
-    private Integer studentId; // 关联的用户ID
+    private Integer userId; // 关联的用户ID
 
     private String idCardName; // 身份证姓名
     private String idCardNumber; // 身份证号
